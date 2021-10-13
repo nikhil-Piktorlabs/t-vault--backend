@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const Safes = require("../models/safesModel");
 
 const router = express.Router();
@@ -57,12 +56,33 @@ router.patch("/:safeId", async (req, res) => {
   }
 });
 
-router.patch("/:safeId/secrets/:secretId", async (req, res) => {
+router.patch("/:safeId/secrets", async (req, res) => {
   try {
-    const secretDeleted = await Safes.findByIdAndUpdate(req.params.safeId, {
-      $pull: { secrets: { _id: mongoose.Types.ObjectId(req.params.secretId) } },
-    });
-    console.log("yo");
+    const secretAdded = await Safes.findByIdAndUpdate(
+      req.params.safeId,
+      {
+        $push: { secrets: { name: req.body.name } },
+      },
+      { new: true }
+    );
+
+    res.send(secretAdded);
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+router.delete("/:safeId/secrets/:secretId", async (req, res) => {
+  try {
+    const secretDeleted = await Safes.findByIdAndUpdate(
+      req.params.safeId,
+      {
+        $pull: {
+          secrets: { _id: req.params.secretId },
+        },
+      },
+      { new: true }
+    );
 
     res.send(secretDeleted);
   } catch (e) {

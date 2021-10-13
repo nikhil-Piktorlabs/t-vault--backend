@@ -8,12 +8,12 @@ const app = new express();
 app.use(express.json());
 app.use("/api", router);
 
-const port = process.env.PORT || 4000;
-
 mongoose
   .connect(process.env.DATABASE)
   .then(() => console.log("Connected to MongoDB"))
   .catch((e) => console.log(e));
+
+const port = process.env.PORT || 4000;
 
 app.listen(port, () => {
   console.log(`Listening on port: ${port}`);
