@@ -78,10 +78,8 @@ router.delete("/:safeId/secrets/:secretId", async (req, res) => {
     const secretDeleted = await Safes.findByIdAndUpdate(
       req.params.safeId,
       {
-        $pull: {
-          secrets: { _id: req.params.secretId },
-          updated: Date.now(),
-        },
+        $pull: { secrets: { _id: req.params.secretId } },
+        updated: Date.now(),
       },
       { new: true }
     );
