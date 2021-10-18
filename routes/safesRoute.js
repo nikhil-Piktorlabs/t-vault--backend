@@ -62,6 +62,7 @@ router.patch("/:safeId/secrets", async (req, res) => {
       req.params.safeId,
       {
         $push: { secrets: { name: req.body.name } },
+        updated: Date.now(),
       },
       { new: true }
     );
@@ -79,6 +80,7 @@ router.delete("/:safeId/secrets/:secretId", async (req, res) => {
       {
         $pull: {
           secrets: { _id: req.params.secretId },
+          updated: Date.now(),
         },
       },
       { new: true }
