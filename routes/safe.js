@@ -1,16 +1,16 @@
 const express = require("express");
-const Safes = require("../models/safesModel");
+const Safe = require("../models/safe");
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const safes = await Safes.find();
+  const safes = await Safe.find();
 
   res.send(safes);
 });
 
 router.post("/", async (req, res) => {
-  const safe = new Safes({
+  const safe = new Safe({
     name: req.body.name,
     owner: req.body.owner,
     type: req.body.type,
@@ -22,26 +22,37 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:safeId", async (req, res) => {
-  const removedSafe = await Safes.findByIdAndRemove(req.params.safeId);
+  const removedSafe = await Safe.findByIdAndRemove(req.params.safeId);
 
   res.send(removedSafe);
 });
 
 router.patch("/:safeId", async (req, res) => {
-  const updatedSafe = await Safes.findByIdAndUpdate(
+  const updatedSafe = await Safe.findByIdAndUpdate(
     req.params.safeId,
     {
-      $set: req.body,
+      name: req.body.name,
+      owner: req.body.owner,
+      type: req.body.type,
+      description: req.body.description,
+      secrets: req.body.secrets,
       updated: Date.now(),
     },
-    { new: true }
+    { new: true, runValidators: true, context: "query" }
   );
 
   res.send(updatedSafe);
 });
 
 router.patch("/:safeId/secrets", async (req, res) => {
-  const secretAdded = await Safes.findByIdAndUpdate(
+  const secret = await Safe.find({
+    _id: req.params.safeId,
+    secrets: { $elemMatch: { name: req.body.name } },
+  });
+  if (secret.length > 0)
+    return res.status(400).send("Secret with same name already exists!");
+
+  const secretAdded = await Safe.findByIdAndUpdate(
     req.params.safeId,
     {
       $push: { secrets: { name: req.body.name } },
@@ -54,7 +65,7 @@ router.patch("/:safeId/secrets", async (req, res) => {
 });
 
 router.delete("/:safeId/secrets/:secretId", async (req, res) => {
-  const secretDeleted = await Safes.findByIdAndUpdate(
+  const secretDeleted = await Safe.findByIdAndUpdate(
     req.params.safeId,
     {
       $pull: { secrets: { _id: req.params.secretId } },

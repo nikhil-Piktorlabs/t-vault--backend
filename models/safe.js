@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
-var uniqueValidator = require("mongoose-unique-validator");
+const uniqueValidator = require("mongoose-unique-validator");
+const secretSchema = require("./secret");
 
-const SafesSchema = mongoose.Schema({
+const safeSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -12,10 +13,10 @@ const SafesSchema = mongoose.Schema({
   owner: { type: String, required: true, trim: true, minlength: 1 },
   type: { type: String, required: true, enum: ["personal", "other"] },
   description: { type: String, trim: true, minlength: 10 },
-  secrets: [{ name: String, added: { type: Date, default: Date.now } }],
+  secrets: [secretSchema],
   updated: { type: Date, default: Date.now },
 });
 
-SafesSchema.plugin(uniqueValidator);
+safeSchema.plugin(uniqueValidator);
 
-module.exports = mongoose.model("Safes", SafesSchema);
+module.exports = mongoose.model("Safe", safeSchema);

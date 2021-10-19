@@ -1,13 +1,7 @@
 module.exports = function (err, req, res, next) {
-  if (err.name === "ValidationError") {
-    let errors = {};
+  if (err.name === "ValidationError")
+    return res.status(400).send(Object.values(err.errors)[0].message);
 
-    Object.keys(err.errors).forEach((key) => {
-      errors[key] = err.errors[key].message;
-    });
-
-    return res.status(400).send(errors);
-  }
-
-  res.status(500).send("Something went wrong");
+  console.log(err);
+  res.status(500).send(err);
 };
