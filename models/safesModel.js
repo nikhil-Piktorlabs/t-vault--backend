@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+var uniqueValidator = require("mongoose-unique-validator");
 
 const SafesSchema = mongoose.Schema({
   name: {
@@ -14,5 +15,7 @@ const SafesSchema = mongoose.Schema({
   secrets: [{ name: String, added: { type: Date, default: Date.now } }],
   updated: { type: Date, default: Date.now },
 });
+
+SafesSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model("Safes", SafesSchema);
